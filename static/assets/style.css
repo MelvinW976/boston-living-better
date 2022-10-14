@@ -3,3 +3,12 @@
     height:600px;
     width:50%;
 }
+h2{
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+body{
+    margin:50px;
+}
+.side-info{
+    width: 100px;
+}
