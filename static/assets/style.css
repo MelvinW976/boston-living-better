@@ -1,14 +1,23 @@
 #map{
     display:block;
     height:600px;
-    width:50%;
+    width:500px;
 }
 h2{
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
-body{
-    margin:50px;
-}
 .side-info{
     width: 100px;
+}
+h3{
+    font-family:  Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+body{
+    padding:0;
+    margin:0;
+}
+html, body{
+    height:100%;
+    width: 100%;
 }
