@@ -194,14 +194,14 @@ def get_zip_count(most_concern_list, second_concern_list):
         lon = item['val'][0]
         lat = item['val'][1]    
         zipcode = get_zipcode(lon, lat)
-        tmp= []([0], [0] ,[])
+        tmp= [[0], [0] ,[]]
         zip_count[zipcode]= zip_count.get(zipcode, tmp)
         zip_count[zipcode][0][0]+=1
     for item in second_concern_list:
         lon = item['val'][0]
         lat = item['val'][1]    
         zipcode = get_zipcode(lon, lat)
-        tmp= []([0], [0] ,[])
+        tmp= [[0], [0] ,[]]
         zip_count[zipcode]= zip_count.get(zipcode, tmp)
         zip_count[zipcode][1][0]+=1
     zip_list = list(zip_count.keys())
