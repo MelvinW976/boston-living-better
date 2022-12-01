@@ -23,20 +23,14 @@ database = client.get_database_client(database_name)
 container = database.get_container_client(container='blb_container')
 
 cache = Cache(app)
-
-
 # @app.route('/get_suggestions', methods=["GET", "POST"])
-
 # def retrive_data():
 #     # handle the input of the user and retrieve the data (List[List]) from the database
 #     return
  # handle the input of the user and retrieve the data (List[List]) from the database
-
 # def generate_markers():
 #     # generate the markers according to the lon lat (retrieved list) for the map
 #     return
-
-
 @app.route("/get_suggestions")
 def get_zipcode(lon, lat):
     geolocator = geopy.geocoders.Nominatim(user_agent="my-application")
