@@ -107,18 +107,20 @@ def generate_concern_markers(most_concern, second_concern, item_list):
             lon = item['val'][0]
             lat = item['val'][1]
             cat = item['val'][2]
+            time= item['id']
             most_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
-                {idd}.addTo(map).bindPopup('{cat}');".format(idd="idd"+str(idd), latitude=lat,\
-                                                                            longitude=lon, cat=cat)
+                {idd}.addTo(map).bindPopup('{cat}<br>{time}');".format(idd="idd"+str(idd), latitude=lat,\
+                                                                            longitude=lon, cat=cat, time=time)
         elif item['val'][2] == second_concern:
             second_concern_list.append(item)
             idd+=1
             lon = item['val'][0]
             lat = item['val'][1]
             cat = item['val'][2]
+            time= item['id']
             second_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
-                {idd}.addTo(map).bindPopup('{cat}');".format(idd="idd"+str(idd), latitude=lat,\
-                                                                            longitude=lon, cat=cat)
+                {idd}.addTo(map).bindPopup('{cat} <br> {time}');".format(idd="idd"+str(idd), latitude=lat,\
+                                                                            longitude=lon, cat=cat, time= time)
     return most_concern_marker, second_concern_marker, most_concern_list, second_concern_list
 
 def generate_infra_markers(shops, restaurants, hotels, hospitals):
@@ -172,6 +174,7 @@ def generate_infra_markers(shops, restaurants, hotels, hospitals):
             {idd}.addTo(map).bindPopup('hospital <br> {shop_brand}');".format(idd="idd"+str(idd), latitude=lat,\
                                                                         longitude=lon, shop_brand=shop_brand)
     return shop_marker, restaurant_marker, hotel_marker, hospital_marker
+
 
 def get_zip_count(most_concern_list, second_concern_list):
     # provide the suggestions for the user
