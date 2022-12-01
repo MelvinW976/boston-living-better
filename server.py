@@ -18,6 +18,5 @@ container = database.create_container_if_not_exists(
     partition_key=PartitionKey(path="/id"),
 )
 
-
-# Initialize Cosmos DB
 # update Cosmos DB 
+

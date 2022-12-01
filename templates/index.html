@@ -20,25 +20,30 @@
         </div>
       </nav>
       <div class="p-3 mb-2 bg-light text-dark" style="height:110px;">
-        <div class="row" style="margin: 20px;margin-left: 10px; ">
-          <div class="col-md-1" style="padding-top: 5px; padding-left: 15px; ">Most concern:</div>
+        <div class="row" style="margin: 20px;margin-left: 25px;">
+          <div class="col-md-1" style="padding-top: 5px;">Concern 1:</div>
           <div class="col-md-2" style="padding-left: 5px; padding-right: 30px; border-right: 1px solid rgb(197, 186, 186);">
             <select id="concern" class="form-control selectpicker" data-live-search="true">
             </select>
           </div>
-          <div class="col-md-1" style="padding-top: 5px; padding-left: 5px; margin-left: 30px;  margin-right: 5px;">Second concern:</div>
+          <div class="col-md-1" style="padding-top: 5px; padding-left: 5px; margin-left: 30px; margin-right:5px;">Concern 2:</div>
           <div class="col-md-2" style="padding-left: 5px; padding-right: 30px; border-right: 1px solid rgb(197, 186, 186);" >
             <select id="concern" class="form-control selectpicker" data-live-search="true">
             </select>
           </div>          
-          <div class="col-md-1" style="width: 150px; padding-left: 35px; padding-top: 5px;  margin-left:5px; ">Period (year):</div>
-          <div class="col-md-2 d-flex" style="padding-top: 5px; ">
-            <span class="font-weight-bold" style="padding-right: 10px;">0</span>
-            <form class="range-field w-25" style="padding-top: 2px;">
-              <input class="border-0" type="range" min="0" max="5" oninput="this.nextElementSibling.value = this.value"/>
+          <!-- <div class="col-md-1" style="width: 150px; padding-left: 35px; padding-top: 5px;  margin-left:5px; ">Stay Period</div> -->
+          <div class="col-md-1 d-flex" style="padding-top: 5px; margin-left: 35px; margin-right: 80px;">
+            <span class="font-weight-bold" >0</span>
+            <form class="range-field" style="width: 150px; padding-top: 2px;padding-left: 10px;padding-right: 10px;">
+              <input class="border-0" type="range" min="0" max="6" oninput="this.nextElementSibling.value = this.value"/>
             </form>
-            <output class="font-weight-bold" style=" margin-left: 85px;">5</output>
+            <span class="font-weight-bold">6</span>
           </div>
+          <select class="form-select col-md-1" aria-label="Default select example" style="height: 40px; width: 100px; padding-top: 5px;">
+            <option selected value="1">Month</option>
+            <option value="2">Year</option>
+          </select>
+          <div class="col-md-1"></div>
           <div class="col-md-1">
             <button type="button" class="btn btn-primary" style="width: 150px;" onclick="predict()">Get Suggestion</button>
           </div>
