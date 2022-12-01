@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template,request,redirect,url_for
+from flask import Flask, jsonify, request, render_template,request,redirect,url_for
 from flask_caching import Cache
 from flask import render_template
 from azure.cosmos import CosmosClient
@@ -39,29 +39,51 @@ cache = Cache(app)
 
 @app.route("/get_suggestions")
 def get_zipcode(lon, lat):
-    # get the zipcode, name, center location and radius of the input location by geopy
     geolocator = geopy.geocoders.Nominatim(user_agent="my-application")
     location = geolocator.reverse("{}, {}".format(lat, lon))
     address = location.raw['address']
     zipcode = address.get('postcode', '')
     return zipcode
 
-    
+def read_area():
+    # read the area from the local json file
+    with open('./area.json') as f:  
+        data = json.load(f)
+    return data
 
-def get_shops(latitude, longitude):
+def get_infrastructure(latitude, longitude, radius):
     # Initialize the API
     api = overpy.Overpass()
     # Define the query
-    query = """(node["shop"](around:500,{lat},{lon});
-                node["building"="retail"](around:500,{lat},{lon});
-                node["building"="supermarket"](around:500,{lat},{lon});
-                node["healthcare"="pharmacy"](around:500,{lat},{lon});
+    shop_query = """(node["shop"](around:{r},{lat},{lon});
+                node["building"="retail"](around:{r},{lat},{lon});
+                node["building"="supermarket"](around:{r},{lat},{lon});
+                node["healthcare"="pharmacy"](around:{r},{lat},{lon});
+                node["amenity"="restaurant"](around:{r},{lat},{lon});
+                node["amenity"="bank"](around:{r},{lat},{lon});
             );out;
-            """.format(lat=latitude, lon=longitude)
+            """.format(r=radius,lat=latitude, lon=longitude)
+    restaurants_query = """(node["amenity"="restaurant"](around:{r},{lat},{lon});
+                node["amenity"="fast_food"](around:{r},{lat},{lon});
+                node["amenity"="cafe"](around:{r},{lat},{lon});
+                node["amenity"="bar"](around:{r},{lat},{lon});
+                );out;
+            """.format(r=radius,lat=latitude, lon=longitude)
+    Hotels_query = """(node["tourism"="hotel"](around:{r},{lat},{lon});
+                node["tourism"="motel"](around:{r},{lat},{lon});
+            );out;
+            """.format(r=radius,lat=latitude, lon=longitude)
+    Hospitals_query = """(node["amenity"="hospital"](around:{r},{lat},{lon});
+            );out;
+            """.format(r=radius,lat=latitude, lon=longitude)
     # Call the API
-    result = api.query(query)
-    return result
-def get_suggestions(most_concern, second_concern, period):
+    shops= api.query(shop_query)
+    restaurants = api.query(restaurants_query)
+    hotels = api.query(Hotels_query)
+    hospitals = api.query(Hospitals_query)
+    return shops, restaurants, hotels, hospitals
+
+def fetch_data(period):
     item_list=[]
     cur_year= current_date[:4]
     start_year = int(cur_year)-int(period) 
@@ -71,6 +93,9 @@ def get_suggestions(most_concern, second_concern, period):
                                 query=query,
                                 enable_cross_partition_query=True)):
         item_list.append(item)
+    return item_list
+
+def generate_markers(most_concern, second_concern, item_list):
     counter= collections.Counter(item['val'][2])
     most_concern = counter.most_common(1)[0][0]
     second_concern = counter.most_common(2)[1][0] 
@@ -99,14 +124,54 @@ def get_suggestions(most_concern, second_concern, period):
             second_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
                 {idd}.addTo(map).bindPopup('{cat}');".format(idd="idd"+str(idd), latitude=lat,\
                                                                             longitude=lon, cat=cat)
-    area_list = []
+    return most_concern_marker, second_concern_marker, most_concern_list, second_concern_list
+def get_suggestions(most_concern_list, second_concern_list):
+    # provide the suggestions for the user
+    area_list = read_area()['zipcode']
+    zipcode_map={}
+    for area in area_list:
+        zip_info=[]
+        zip_info.append(area['lon'])
+        zip_info.append(area['lat'])
+        zip_info.append(area['radius'])
+        if zipcode_map.get(area['zip']) is None:
+            zipcode_map[area['zip']] = zip_info
+    zip_count={} # key: zip, value: List[List[int]] (most_concern, second_concern, infrastructure)
+
     #Count # of most concern and second concern in the period for each area
     for item in most_concern_list:
         lon = item['val'][0]
         lat = item['val'][1]    
-
-
-    # ranking the areas with defined hate_factor:For each area,  Number of most concern * 0.7 + second concern * 0.3. 
+        zipcode = get_zipcode(lon, lat)
+        tmp= []([0], [0] ,[0])
+        zip_count[zipcode]= zip_count.get(zipcode, tmp)
+        zip_count[zipcode][0][0]+=1
+    for item in second_concern_list:
+        lon = item['val'][0]
+        lat = item['val'][1]    
+        zipcode = get_zipcode(lon, lat)
+        tmp= [](0, 0 ,0)
+        zip_count[zipcode]= zip_count.get(zipcode, tmp)
+        zip_count[zipcode][1][0]+=1
+    zip_list = list(zip_count.keys())
+    #Count # of infrastructure in the period for each area
+    shop_marker=''
+    restaurant_marker=''
+    hotel_marker=''
+    hospital_marker=''
+    for zip in zip_list:
+        info= zipcode_map[zip] 
+        shops, restaurants, hotels, hospitals = get_infrastructure(info[1], info[0], info[2])
+        zip_count[zip][2]= [len(shops.nodes), len(restaurants.nodes), len(hotels.nodes), len(hospitals.nodes), 
+            len(shops.nodes)+len(restaurants.nodes)+len(hotels.nodes)+len(hospitals.nodes)]
+    
+    # sort the zip_count by the number of infrastructure and hate_factor:Num of most concern * 0.7 + second concern * 0.3. and return the top 3
+    zip_count = sorted(zip_count.items(), key=lambda x: x[1][2][4]*0.3+x[1][0][0]*0.7+x[1][1][0]*0.3, reverse=True)
+    recommendation = []
+    for i in range(3):
+        recommendation.append(zip_count[i][0])  
+    return recommendation
+   
 
 @app.route('/', methods=["GET", "POST"])
 @cache.cached(timeout=50)
