@@ -246,7 +246,7 @@ def get_suggestion(zip_count):
         zip_count[zip][1][0]= sconcern[zip_list.index(zip)]
 
     # sort the zip_count by the normalized number of infrastructure and normalized hate_factor(# of most concern * 0.7 + second concern * 0.3. and return the top 3)
-    zip_count = sorted(zip_count.items(), key=lambda x: x[1][2][4]*0.2-x[1][0][0]*0.4-x[1][1][0]*0.2, reverse=True)
+    zip_count = sorted(zip_count.items(), key=lambda x: x[1][2][4]*0.2-x[1][0][0]*0.5-x[1][1][0]*0.3, reverse=True)
     recommendation = []
     for i in range(3):
         recommendation.append(zip_count[i])  
