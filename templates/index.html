@@ -23,29 +23,35 @@
         <div class="row" style="margin: 20px;margin-left: 25px;">
           <div class="col-md-1" style="padding-top: 5px;">Concern 1:</div>
           <div class="col-md-2" style="padding-left: 5px; padding-right: 30px; border-right: 1px solid rgb(197, 186, 186);">
-            <select id="concern" class="form-control selectpicker" data-live-search="true">
+            <select id="concern1" class="form-control selectpicker" data-live-search="true">
+              {% for category in category_list %}
+                <option data-tokens={{category}}>{{category}}</option>
+              {% endfor %}
             </select>
           </div>
           <div class="col-md-1" style="padding-top: 5px; padding-left: 5px; margin-left: 30px; margin-right:5px;">Concern 2:</div>
           <div class="col-md-2" style="padding-left: 5px; padding-right: 30px; border-right: 1px solid rgb(197, 186, 186);" >
-            <select id="concern" class="form-control selectpicker" data-live-search="true">
+            <select id="concern2" class="form-control selectpicker" data-live-search="true">
+              {% for category in category_list %}
+                <option data-tokens={{category}}>{{category}}</option>
+              {% endfor %}
             </select>
           </div>          
           <!-- <div class="col-md-1" style="width: 150px; padding-left: 35px; padding-top: 5px;  margin-left:5px; ">Stay Period</div> -->
           <div class="col-md-1 d-flex" style="padding-top: 5px; margin-left: 35px; margin-right: 80px;">
             <span class="font-weight-bold" >0</span>
             <form class="range-field" style="width: 150px; padding-top: 2px;padding-left: 10px;padding-right: 10px;">
-              <input class="border-0" type="range" min="0" max="6" oninput="this.nextElementSibling.value = this.value"/>
+              <input id="number" class="border-0" type="range" min="0" max="6" />
             </form>
             <span class="font-weight-bold">6</span>
           </div>
-          <select class="form-select col-md-1" aria-label="Default select example" style="height: 40px; width: 100px; padding-top: 5px;">
-            <option selected value="1">Month</option>
-            <option value="2">Year</option>
+          <select id="period" class="form-select col-md-1" aria-label="Default select example" style="height: 40px; width: 100px; padding-top: 5px;">
+            <option selected value="month">Month</option>
+            <option value="year">Year</option>
           </select>
           <div class="col-md-1"></div>
           <div class="col-md-1">
-            <button type="button" class="btn btn-primary" style="width: 150px;" onclick="predict()">Get Suggestion</button>
+            <button type="button" class="btn btn-primary" style="width: 150px;" onclick="get_suggestion()">Get Suggestion</button>
           </div>
         </div>
       </div>
@@ -70,6 +76,16 @@
         var map = L.map('map').setView([42.361145, -71.057083], 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'}).addTo(map);
         {{markers|safe}}
+
+        function get_suggestion(){
+          let concern1= document.getElementById('concern1').value
+          let concern2= document.getElementById('concern2').value
+          let time= document.getElementById('number').value
+          let period= document.getElementById('period').value
+          if(period == 'year'){
+            time = 12 * time // all the time transform to months
+          }
+        }
     </script>
 </body>
 </html>

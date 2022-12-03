@@ -1,14 +1,14 @@
-from flask import Flask, jsonify, request, render_template,request,redirect,url_for
+from flask import Flask, jsonify, request, render_template
 from flask_caching import Cache
 from flask import render_template
 from azure.cosmos import CosmosClient
 from config import CLOUD_CONFIGURE
 import geopy
 import json
-import os
 import collections
 import overpy
 import numpy as np
+import pandas as pd
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.config["APPLICATION_ROOT"] = "/"
@@ -252,6 +252,10 @@ def get_suggestion(zip_count):
         recommendation.append(zip_count[i])  
     return recommendation
    
+@app.route("/listcategory")
+def list_category():
+    df_cat= pd.read_csv('cat.csv')
+    return df_cat['Category'].tolist()
 
 @app.route('/', methods=["GET", "POST"])
 @cache.cached(timeout=50)
@@ -267,7 +271,8 @@ def index():
         markers += "var {idd} = L.marker([{latitude}, {longitude}]);\
                 {idd}.addTo(map).bindPopup('{cat}');".format(idd="idd"+str(idd), latitude=lat,\
                                                                             longitude=lon, cat=cat)
-    return render_template('index.html', markers=markers)
+    category_list= list_category()
+    return render_template('index.html', markers=markers, category_list=category_list)
 
     # if request.method == "POST":
     #     hate1= request.form["hate1"]
