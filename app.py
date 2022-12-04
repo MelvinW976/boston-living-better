@@ -6,6 +6,7 @@ from config import CLOUD_CONFIGURE
 import geopy
 import json
 import collections
+import plotly
 import overpy
 import numpy as np
 import pandas as pd
@@ -90,38 +91,30 @@ def fetch_data(period):
         item_list.append(item)
     return item_list
 
-def generate_concern_markers(most_concern, second_concern, item_list):
-    counter= collections.Counter(item['val'][2])
-    most_concern = counter.most_common(1)[0][0]
-    second_concern = counter.most_common(2)[1][0] 
+def generate_concern_markers(most_concern_list, second_concern_list):
     most_concern_marker=''
     second_concern_marker=''
     idd= 0
     # generate the markers for most concern and second concern
-    most_concern_list = []
-    second_concern_list = []
-    for item in item_list:
-        if item['val'][2] == most_concern:
-            most_concern_list.append(item)
-            idd+=1
-            lon = item['val'][0]
-            lat = item['val'][1]
-            cat = item['val'][2]
-            time= item['id']
-            most_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
-                {idd}.addTo(map).bindPopup('{cat}<br>{time}');".format(idd="idd"+str(idd), latitude=lat,\
-                                                                            longitude=lon, cat=cat, time=time)
-        elif item['val'][2] == second_concern:
-            second_concern_list.append(item)
-            idd+=1
-            lon = item['val'][0]
-            lat = item['val'][1]
-            cat = item['val'][2]
-            time= item['id']
-            second_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
-                {idd}.addTo(map).bindPopup('{cat} <br> {time}');".format(idd="idd"+str(idd), latitude=lat,\
-                                                                            longitude=lon, cat=cat, time= time)
-    return most_concern_marker, second_concern_marker, most_concern_list, second_concern_list
+    for item in most_concern_list:
+        idd+=1
+        lon = item['val'][0]
+        lat = item['val'][1]
+        cat = item['val'][2]
+        time= item['id']
+        most_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
+            {idd}.addTo(map).bindPopup('{cat}<br>{time}');".format(idd="idd"+str(idd), latitude=lat,\
+                                                                        longitude=lon, cat=cat, time=time)
+    for item in second_concern_list:
+        idd+=1
+        lon = item['val'][0]
+        lat = item['val'][1]
+        cat = item['val'][2]
+        time= item['id']
+        second_concern_marker += "var {idd} = L.marker([{latitude}, {longitude}]);\
+            {idd}.addTo(map).bindPopup('{cat} <br> {time}');".format(idd="idd"+str(idd), latitude=lat,\
+                                                                        longitude=lon, cat=cat, time= time)
+    return most_concern_marker, second_concern_marker
 
 def generate_infra_markers(shops, restaurants, hotels, hospitals):
     shop_marker=''
@@ -281,6 +274,41 @@ def index():
     #     item_list= retrive_data(hate1, hate2, period)
     #     if len(item_list) == 0:
     #         return render_template("index.html", no_data=True)
+
+
+@app.route('/callback/<endpoint>')
+def get_suggestion(endpoint):
+    if endpoint == "suggestion":
+        concern1= request.args.get('concern1')
+        concern2= request.args.get('concern2')
+        period= request.args.get('period')
+        time= request.args.get('number')
+        concern1_list, concern2_list= fetch_data(concern1, concern2, period) # fetch data constrained by the concern types
+        if endpoint == "plot":
+            plot_list1= fetch_plot(zipcode1, concern1, period) # fetch data constrained by zipcode, concern types
+            plot_list2= fetch_plot(zipcode2, concern1, period)
+            plot_list3= fetch_plot(zipcode3, concern1, period)
+            graphJSON= json.dumps(fig, cls= plotly.utils.PlotlyJSONEncoder)
+
+            return graphJSON
+        elif endpoint == "concern_marker":
+            marker1, marker2= generate_concern_markers(concern1_list, concern2_list)
+            return marker1, marker2
+        elif endpoint == "infra_marker":
+            shop_marker=''
+            restaurant_marker=''
+            hotel_marker=''
+            hospital_marker=''
+            for zip in zip_list:
+                info= zipcode_map[zip] 
+                shops, restaurants, hotels, hospitals = get_infrastructure(info[1], info[0], info[2])
+                shop_marker, restaurant_marker, hotel_marker, hospital_marker = generate_infra_markers(shops, restaurants, hotels, hospitals)
+                zip_count[zip][2]= [len(shops.nodes), len(restaurants.nodes), len(hotels.nodes), len(hospitals.nodes), 
+                    len(shops.nodes)+len(restaurants.nodes)+len(hotels.nodes)+len(hospitals.nodes), shop_marker, restaurant_marker, hotel_marker, hospital_marker]
+                return markers
+    else:
+        return "Bad endpoint", 400
+
 
 if __name__ == '__main__':
     app.run(debug=True)
