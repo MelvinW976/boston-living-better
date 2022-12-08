@@ -33,5 +33,4 @@ def main(mytimer: func.TimerRequest) -> None:
     # test_upload(utc_timestamp)
     if mytimer.past_due:
         logging.info('The timer is past due!')
-
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
