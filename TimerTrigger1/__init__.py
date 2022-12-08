@@ -24,8 +24,6 @@ def main(mytimer: func.TimerRequest) -> None:
     if Counter == 12:
         Counter=0 
         cache_from_database(current_date)
-        print(get_cache())
-    print(current_date)
     utc_timestamp = datetime.datetime.utcnow().replace(
         tzinfo=datetime.timezone.utc).isoformat()
     processed_data = data_preprocess(fetch_from_azureml(current_date))

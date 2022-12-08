@@ -180,14 +180,12 @@
           var concern2 = document.getElementById("concern2").value;
           var period = document.getElementById("period").value;
           var number = document.getElementById("number").value;
-          console.log(concern1, concern2, period, number)
           let response = await fetch("/callback/suggestion?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
           if(response.ok) {
             let recommendation = await response.json();
             if (recommendation["1"] == "n") {
               alert("HTTP-Error: No enough data, please increase the range" );
             }else {
-              console.log(recommendation);
               indicator(recommendation);
             }
             response = await fetch("/callback/get_markers?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
@@ -195,16 +193,11 @@
                 let m_list = await response.json();
                 concern1_list= m_list['concern1'];
                 concern2_list= m_list['concern2'];
-                console.log(concern1_list.length);
-                console.log(concern2_list.length);
                 
                 map.remove();
                 map = L.map('map').setView([42.361145, -71.057083], 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'}).addTo(map);
-                console.log(concern1_list.length);
-                console.log(concern2_list.length);
                 for (var i = 0; i < concern1_list.length; i++) {
-                  console.log([concern1_list[i]['val'][1], concern1_list[i]['val'][2]])
                   var marker1 = L.marker([concern1_list[i]['val'][1], concern1_list[i]['val'][2]]).addTo(map);
                   marker1.bindPopup("<b>Time: </b>" + concern1_list[i]['val'][0] + "<br><b>Category: </b>" + concern1_list[i]['val'][3]);
                   // using flask add image from url to the marker popup
@@ -225,7 +218,6 @@
             // response = await fetch("/callback/plot?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
             // if(response.ok) {
             //     let plot = await response.json();
-            //     console.log(plot);
             //     Plotly.newPlot('chart_div', plot);
             // }
           }
@@ -234,7 +226,6 @@
           let zip1 = json.first;
           let zip2 = json.second;
           let zip3 = json.third;
-          console.log(zip1);
           
           let name = document.getElementById('zip_code1');
           name.innerHTML = zip1[0];
@@ -290,7 +281,6 @@
         //   let response = await fetch("/callback/plot?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
         //   if(response.ok) {
         //       let marker = await response.json();
-        //       console.log(marker);
         //       markers= marker['concern'];
         //   }
         // }
@@ -302,7 +292,6 @@
         //   let response = await fetch("/callback/plot?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
         //   if(response.ok) {
         //       let marker = await response.json();
-        //       console.log(marker);
         //       markers= marker['infra'];
         //   }
         // }

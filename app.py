@@ -276,14 +276,10 @@ def suggestion(endpoint):
     # if period == 'hour':
     #     concern1_list, concern2_list= get_cache()
     query1, query2= fetch_from_database(concern1, concern2, start_date, end_date)
-    for item in list(container.query_items(query=query1,enable_cross_partition_query=True)):
-        print(item)
     #print(container.query_items(query=query1,enable_cross_partition_query=True))
     concern1_list= list(container.query_items(query=query1,enable_cross_partition_query=True))
     concern2_list= list(container.query_items(query=query2,enable_cross_partition_query=True))
     #print(len(concern1_list), len(concern2_list))
-    print(start_date, end_date)
-    print(len(concern1_list), len(concern2_list))
     # print("fetching data from database...")
     # print(concern1, concern2, start_date, end_date)
     # print(len(concern1_list), len(concern2_list))
@@ -302,14 +298,12 @@ def suggestion(endpoint):
 
     zip_count= get_zip_count(concern1_list, concern2_list)
     
-    print(zip_count)
     recommendation= get_suggestion(zip_count)
     if len(recommendation) < 3:
         recommendation= {"1":"n"}
     else: 
         recommendation= {"first": recommendation[0], "second": recommendation[1], "third": recommendation[2]}
     if endpoint == "suggestion":
-        print("in suggestion")
         return recommendation
     elif endpoint == "get_markers":
         m_list= {"concern1": concern1_list, "concern2": concern2_list}
