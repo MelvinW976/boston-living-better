@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from config import CLOUD_CONFIGURE
 from azure.cosmos import CosmosClient, PartitionKey, exceptions
 from azure.core.exceptions import ResourceExistsError
-from apscheduler.schedulers.background import BackgroundScheduler
 from azureml.opendatasets import BostonSafety
 from datetime import datetime
 from dateutil import parser
@@ -51,3 +50,5 @@ def fetch_from_azureml(currentTime):
 # sched = BackgroundScheduler() 
 # sched.add_job(fetch_from_azureml, 'interval', minutes=1) # call update function every one minute
 # sched.start()
+if __name__ == '__main__':
+    app.run()

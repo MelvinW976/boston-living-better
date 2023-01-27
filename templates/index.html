@@ -183,8 +183,10 @@
           let response = await fetch("/callback/suggestion?concern1=" + concern1 + "&concern2=" + concern2 + "&period=" + period + "&number=" + number);
           if(response.ok) {
             let recommendation = await response.json();
+            console.log(recommendation);
             if (recommendation["1"] == "n") {
               alert("HTTP-Error: No enough data, please increase the range" );
+              return recommendation;
             }else {
               indicator(recommendation);
             }

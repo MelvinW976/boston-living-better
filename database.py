@@ -51,3 +51,6 @@ def past_concerns(zip_code, concern, currentTime, isMonth, num):
             c.zip_code = '{}' AND \
             group by left(c.date,4)".format(start_time,end_time,concern,zip_code)
     return query
+
+if __name__ == '__main__':
+    print("FETCHING DATA FROM YAHOO")

@@ -74,3 +74,6 @@ def cache_from_database(current_time):
 
 def test_upload(val_):
     container.upsert_item(dict(id = uuid.uuid4().hex, val = val_))
+
+if __name__ == '__main__':
+    print("FETCHING DATA FROM YAHOO")
